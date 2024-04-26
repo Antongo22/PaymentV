@@ -21,18 +21,17 @@ namespace PaymentV
 
             client.StartReceiving(Update, Error); // запуск бота
             Console.WriteLine("Бот запущен. Нажмите любую клавишу, чтобы остановить.");
-            Console.ReadKey(); // бот работает, пока не будет нажата любая кнопка в консоле 
 
             MainAsync(args).GetAwaiter().GetResult();
+            Console.ReadLine();
         }
 
         static async Task MainAsync(string[] args)
         {
             PaymentApiService paymentApiService = new PaymentApiService();
-            string orderId = "c5b3fd07-c66b-4f11-9999-1cc5d319f9e3"; // Замените "your_order_id_here" на реальный идентификатор заказа
-            String response = await paymentApiService.GetOrderDataAsync(orderId); // Передаем идентификатор заказа методу GetOrderDataAsync()
+            string orderId = "c5b3fd07-c66b-4f11-9999-1cc5d319f9e3"; 
+            String response = await paymentApiService.GetOrderDataAsync(orderId); 
             Console.WriteLine(response);
-            Console.ReadLine();
         }
 
         /// <summary>

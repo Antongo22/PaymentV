@@ -14,6 +14,7 @@ namespace PaymentV
         public enum BotState
         {
             Default, // стандартное значение
+            GetOrder, // получение заказа
         }
 
         /// <summary>

@@ -220,6 +220,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base\Data.cs" />
+    <Compile Include="Base\GetOrder.cs" />
     <Compile Include="Base\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Base\State.cs" />
