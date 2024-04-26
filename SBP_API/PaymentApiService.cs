@@ -46,7 +46,24 @@ namespace PaymentV.SBP_API
                 JObject jsonResponse = JObject.Parse(responseBody);
 
                 // Получаем значение поля status.value
-                string orderStatus = jsonResponse["status"]["value"].ToString();
+                string orderQR = jsonResponse["qr"]["id"].ToString();
+
+                apiUrl = $"https://pay-test.raif.ru/api/sbp/v2/qrs/{orderQR}";
+
+                // Выполняем GET запрос и получаем ответ
+                response = await _httpClient.GetAsync(apiUrl);
+
+                // Проверяем успешность запроса
+                response.EnsureSuccessStatusCode();
+
+                // Читаем ответ в виде строки
+                responseBody = await response.Content.ReadAsStringAsync();
+
+                // Преобразуем JSON-строку в объект JObject
+                jsonResponse = JObject.Parse(responseBody);
+
+                // Получаем значение поля status.value
+                string orderStatus = jsonResponse["qrStatus"].ToString();
 
                 // Возвращаем полученные данные
                 return orderStatus;
