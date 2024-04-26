@@ -15,6 +15,7 @@ namespace PaymentV
         {
             Default, // стандартное значение
             GetOrder, // получение заказа
+            OrderNotPaid, // статус того, то заказ не оплачен
         }
 
         /// <summary>
@@ -61,9 +62,11 @@ namespace PaymentV
                 case "/cancel":
                     await client.SendTextMessageAsync(message.Chat.Id, $"Отмена.");
                     break;
+                case "/myid":
+                    await client.SendTextMessageAsync(message.Chat.Id, $"Ваш id - {message.Chat.Id}");
+                    break;
                 default:
-                    await client.SendTextMessageAsync(message.Chat.Id, "Я не понимаю вашей команды. Если возникнут проблемы, " +
-                        "можете прописать /help.");
+                    await GetOrder.HandleGetOrder(client, message);
                     break;
             }
         }
