@@ -8,6 +8,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot;
 using System.Threading;
 using PaymentV.SBP_API;
+using PaymentV.Base;
 
 namespace PaymentV
 {
@@ -38,6 +39,7 @@ namespace PaymentV
         async static Task Update(ITelegramBotClient client, Update update, CancellationToken token)
         {
             var message = update.Message;
+            var callbackQuery = update.CallbackQuery;
 
             Console.WriteLine($"{message?.Chat.FirstName ?? "-no name-"}\t\t|\t{message?.Text ?? "-no text-"}");
 
@@ -47,9 +49,23 @@ namespace PaymentV
                 {
                     case State.BotState.Default:
                         await State.HandleDefaultState(client, message);
-                        break;                   
-
+                        break;
                 }
+            }
+            else if (callbackQuery != null)
+            {
+                await HandleCallbackQuery(client, callbackQuery);
+            }
+        }
+
+
+
+        async public static Task HandleCallbackQuery(ITelegramBotClient client, CallbackQuery callbackQuery)
+        {
+            if (callbackQuery.Data.StartsWith("update:"))
+            {
+                await Console.Out.WriteLineAsync("ds");
+                await GetOrder.HandleUpdateOrder(client, callbackQuery);
             }
         }
 
