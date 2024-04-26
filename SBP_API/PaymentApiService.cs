@@ -49,7 +49,7 @@ namespace PaymentV.SBP_API
                 string orderStatus = jsonResponse["status"]["value"].ToString();
 
                 // Возвращаем полученные данные
-                return responseBody;
+                return orderStatus;
             }
             catch (HttpRequestException ex)
             {
