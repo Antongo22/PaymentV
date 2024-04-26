@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -41,7 +42,11 @@ namespace PaymentV.SBP_API
                 // Читаем ответ в виде строки
                 string responseBody = await response.Content.ReadAsStringAsync();
 
-                Console.WriteLine(responseBody);
+                // Преобразуем JSON-строку в объект JObject
+                JObject jsonResponse = JObject.Parse(responseBody);
+
+                // Получаем значение поля status.value
+                string orderStatus = jsonResponse["status"]["value"].ToString();
 
                 // Возвращаем полученные данные
                 return responseBody;
