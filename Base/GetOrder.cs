@@ -25,26 +25,41 @@ namespace PaymentV.Base
                     await client.SendTextMessageAsync(message.Chat.Id, $"Ошибка при получении статуса заказа!");
                     break;
                 case "new":
-                    await client.SendTextMessageAsync(message.Chat.Id, $"Заказ не оплачен!", replyMarkup: inlineKeyboard);
+                    InlineKeyboardMarkup inlineKeyboard = new(new[]
+                    {
+                        InlineKeyboardButton.WithCallbackData(
+                            text: "Обновить", callbackData: $"update:{message.Text}:{message.MessageId + 1}"),
+                    });
+
+                    await client.SendTextMessageAsync(message.Chat.Id, $"Заказ - {message.Text}\n" +
+                                                                    $"Статус - не оплачен!\n" +
+                                                                    $"Последнее обновление - {DateTime.Now.ToString("HH:mm:ss")}\n",
+                                                                    replyMarkup: inlineKeyboard);
                     break;
                 case "paid":
-                    await client.SendTextMessageAsync(message.Chat.Id, $"Заказ оплачен!");
+                    await client.SendTextMessageAsync(message.Chat.Id, $"Заказ - {message.Text}\n" +
+                                                                       $"Статус - оплачен!");
                     break;
             }
         }
 
-        static InlineKeyboardMarkup inlineKeyboard = new(new[]
-        {
-            InlineKeyboardButton.WithCallbackData(
-                text: "Обновить", callbackData: "update"),
-        });
 
         async public static Task HandleUpdateOrder(ITelegramBotClient client, CallbackQuery callbackQuery)
         {
             PaymentApiService paymentApiService = PaymentApiService.Instance;
 
             string orderId = callbackQuery.Data.Split(':')[1];
+            int messageId = int.Parse(callbackQuery.Data.Split(':')[2]);
             string response = await paymentApiService.GetOrderDataAsync(orderId);
+
+            try
+            {
+                await client.DeleteMessageAsync(callbackQuery.Message.Chat.Id, messageId);
+            }
+            catch (Exception ex)
+            {
+                return;
+            }
 
             switch (response?.ToLower())
             {
@@ -52,13 +67,29 @@ namespace PaymentV.Base
                     await client.SendTextMessageAsync(callbackQuery.Message.Chat.Id, $"Ошибка при получении статуса заказа!");
                     break;
                 case "new":
-                    await client.SendTextMessageAsync(callbackQuery.Message.Chat.Id, $"Заказ не оплачен!");
+                    InlineKeyboardMarkup inlineKeyboard = new(new[]
+                    {
+                        InlineKeyboardButton.WithCallbackData(
+                            text: "Обновить", callbackData: $"update:{orderId}:{messageId + 1}"),
+                    });
+
+                    try
+                    {
+                        await client.SendTextMessageAsync(callbackQuery.Message.Chat.Id, $"Заказ - {orderId}\n" +
+                                                                                        $"Статус - не оплачен!\n" +
+                                                                                        $"Последнее обновление - {DateTime.Now.ToString("HH:mm:ss")}",
+                                                                                        replyMarkup: inlineKeyboard);
+                    } catch (Exception ex) 
+                    {
+                        await client.SendTextMessageAsync(callbackQuery.Message.Chat.Id, $"Произошла ошибка при обновлении данных заказа! Повторите попытку позже");
+                    }
                     break;
                 case "paid":
-                    await client.SendTextMessageAsync(callbackQuery.Message.Chat.Id, $"Заказ оплачен!");
+                    await client.SendTextMessageAsync(callbackQuery.Message.Chat.Id, $"Заказ - {orderId}\n" +
+                                                                                     $"Статус - оплачен\n" +
+                                                                                     $"Последнее обновление - {DateTime.Now.ToString("HH:mm:ss")}\",!");
                     break;
             }
-        }
-
+        }x
     }
 }

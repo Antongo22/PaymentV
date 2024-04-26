@@ -9,6 +9,7 @@ using Telegram.Bot;
 using System.Threading;
 using PaymentV.SBP_API;
 using PaymentV.Base;
+using System.Data;
 
 namespace PaymentV
 {
@@ -41,6 +42,7 @@ namespace PaymentV
             var message = update.Message;
             var callbackQuery = update.CallbackQuery;
 
+
             Console.WriteLine($"{message?.Chat.FirstName ?? "-no name-"}\t\t|\t{message?.Text ?? "-no text-"}");
 
             if (message?.Text != null)
@@ -64,7 +66,6 @@ namespace PaymentV
         {
             if (callbackQuery.Data.StartsWith("update:"))
             {
-                await Console.Out.WriteLineAsync("ds");
                 await GetOrder.HandleUpdateOrder(client, callbackQuery);
             }
         }

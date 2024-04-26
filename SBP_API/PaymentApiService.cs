@@ -20,7 +20,6 @@ namespace PaymentV.SBP_API
             DotNetEnv.Env.Load();
             // Получение значения переменной окружения SECRET_KEY
             string secretKey = Environment.GetEnvironmentVariable("SECRET_KEY");
-            Console.WriteLine($"SECRET_KEY: {secretKey}");
             // Добавляем заголовок Authorization с помощью Bearer токена
             _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {secretKey}");
         }
@@ -44,7 +43,6 @@ namespace PaymentV.SBP_API
                 // Формируем URL для запроса, подставляя значение orderId
                 string apiUrl = $"https://pay-test.raif.ru/api/payment/v1/orders/{orderId}";
 
-                await Console.Out.WriteLineAsync(apiUrl);
 
                 // Выполняем GET запрос и получаем ответ
                 HttpResponseMessage response = await _httpClient.GetAsync(apiUrl);
@@ -59,7 +57,7 @@ namespace PaymentV.SBP_API
                 JObject jsonResponse = JObject.Parse(responseBody);
 
                 // Получаем значение поля status.value
-                string orderQR = jsonResponse["qr"]["id"].ToString();
+                string orderQR = jsonResponse?["qr"]?["id"]?.ToString();
 
                 apiUrl = $"https://pay-test.raif.ru/api/sbp/v2/qrs/{orderQR}";
 
@@ -84,13 +82,11 @@ namespace PaymentV.SBP_API
             catch (HttpRequestException ex)
             {
                 // Обрабатываем ошибки HTTP запроса
-                Console.WriteLine($"HTTP Error: {ex.Message}");
                 return null;
             }
             catch (Exception ex)
             {
                 // Обрабатываем другие исключения
-                Console.WriteLine($"Error: {ex.Message}");
                 return null;
             }
         }
