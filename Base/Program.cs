@@ -15,6 +15,7 @@ namespace PaymentV
         static void Main(string[] args)
         {
             var client = new TelegramBotClient("7035713707:AAFIOCBRFt6xvjg0P7t6A_GMP5QshJ0QQ-Q"); // создание бота с нашим токеном
+
             client.StartReceiving(Update, Error); // запуск бота
             Console.WriteLine("Бот запущен. Нажмите любую клавишу, чтобы остановить.");
             Console.ReadKey(); // бот работает, пока не будет нажата любая кнопка в консоле 

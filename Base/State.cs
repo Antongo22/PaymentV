@@ -50,7 +50,8 @@ namespace PaymentV
             switch (message.Text)
             {
                 case "/start":
-                    await client.SendTextMessageAsync(message.Chat.Id, "Привет! Добро пожаловать в PaymentV! Тут вы можете проверить статус оплаты.");
+                    await client.SendTextMessageAsync(message.Chat.Id, "Привет! Добро пожаловать в PaymentV! " +
+                        "Тут вы можете проверить статус оплаты.");
                     break;
                 case "/help":
                     await client.SendTextMessageAsync(message.Chat.Id, "Вам никто не поможет!)");
