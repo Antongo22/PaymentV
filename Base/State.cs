@@ -16,6 +16,8 @@ namespace PaymentV
             Default, // стандартное значение
             GetOrder, // получение заказа
             OrderNotPaid, // статус того, то заказ не оплачен
+            UnVerified, // состояние, когда невкрефицирован
+            SendVerifiedRequest, // состояние отправки запроса на добавление в команду
         }
 
         /// <summary>
@@ -64,6 +66,9 @@ namespace PaymentV
                     break;
                 case "/myid":
                     await client.SendTextMessageAsync(message.Chat.Id, $"Ваш id - {message.Chat.Id}");
+                    break;
+                case "1488":
+                    await client.SendTextMessageAsync(message.Chat.Id, $"Заказ опалачивать не просим");
                     break;
                 default:
                     await GetOrder.HandleGetOrder(client, message);

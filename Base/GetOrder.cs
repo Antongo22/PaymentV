@@ -17,8 +17,8 @@ namespace PaymentV.Base
         {
             PaymentApiService paymentApiService = PaymentApiService.Instance;
 
-            string response = await paymentApiService.GetOrderDataAsync(message.Text);
-
+            string response = await paymentApiService.GetOrderDataAsync(message.Text.Trim());
+            
             switch (response?.ToLower())
             {
                 case null:
@@ -50,7 +50,7 @@ namespace PaymentV.Base
 
             string orderId = callbackQuery.Data.Split(':')[1];
             int messageId = int.Parse(callbackQuery.Data.Split(':')[2]);
-            string response = await paymentApiService.GetOrderDataAsync(orderId);
+            string response = await paymentApiService.GetOrderDataAsync(orderId.Trim());
 
             try
             {
@@ -90,6 +90,6 @@ namespace PaymentV.Base
                                                                                      $"Последнее обновление - {DateTime.Now.ToString("HH:mm:ss")}\",!");
                     break;
             }
-        }x
+        }
     }
 }

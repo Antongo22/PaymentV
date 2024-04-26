@@ -42,15 +42,36 @@ namespace PaymentV
             var message = update.Message;
             var callbackQuery = update.CallbackQuery;
 
+            Console.WriteLine($"{message?.Chat.FirstName ?? "-no name-"}\t\t\t\t|\t{message?.Text ?? "-no text-"}");
 
-            Console.WriteLine($"{message?.Chat.FirstName ?? "-no name-"}\t\t|\t{message?.Text ?? "-no text-"}");
 
             if (message?.Text != null)
             {
+                if (!Data.userStates.ContainsKey(message.Chat.Id))
+                {
+                    Data.userStates.Add(message.Chat.Id, new Data.User(State.BotState.Default));
+                    if (DataBase.IsVerified(message.Chat.Id))
+                    {
+                        Data.userStates[message.Chat.Id].isVerified = true;
+                        Data.userStates[message.Chat.Id].botState = State.BotState.Default;
+                    }
+                    else
+                    {
+                        Data.userStates[message.Chat.Id].isVerified = false;
+                        Data.userStates[message.Chat.Id].botState = State.BotState.UnVerified;
+                    }
+                }
+
                 switch (State.GetBotState(message.Chat.Id))
                 {
                     case State.BotState.Default:
                         await State.HandleDefaultState(client, message);
+                        break;
+                    case State.BotState.UnVerified:
+                        await Verification.HandleUnVerified(client, message);
+                        break;
+                    case State.BotState.SendVerifiedRequest:
+                        await client.SendTextMessageAsync(message.Chat.Id, $"Ожидание решения заказчика!");
                         break;
                 }
             }
@@ -67,6 +88,10 @@ namespace PaymentV
             if (callbackQuery.Data.StartsWith("update:"))
             {
                 await GetOrder.HandleUpdateOrder(client, callbackQuery);
+            }
+            else if (callbackQuery.Data.StartsWith("request:"))
+            {
+                await Verification.HandleUpdateOrder(client, callbackQuery);
             }
         }
 

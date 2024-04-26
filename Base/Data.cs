@@ -18,6 +18,7 @@ namespace PaymentV.Base
                 this.botState = botState;
             }
             public State.BotState botState; // состояние 
+            public bool isVerified = false;
         }
 
         // Хранение состояния для каждого пользователя
