@@ -12,7 +12,6 @@ namespace PaymentV.SBP_API
     {
         private static PaymentApiService _instance;
         private readonly HttpClient _httpClient;
-        private static PaymentApiService _instance;
 
         private PaymentApiService()
         {
