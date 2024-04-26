@@ -223,6 +223,7 @@
     <Compile Include="Base\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Base\State.cs" />
+    <Compile Include="SBP_API\PaymentApiService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".env">
