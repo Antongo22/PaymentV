@@ -19,20 +19,14 @@ namespace PaymentV
             var BotToken = DotNetEnv.Env.GetString("BOT_TOKEN"); ;
             var client = new TelegramBotClient(BotToken); // создание бота с нашим токеном
 
+            PaymentApiService paymentApiService = PaymentApiService.Instance;
+
             client.StartReceiving(Update, Error); // запуск бота
             Console.WriteLine("Бот запущен. Нажмите любую клавишу, чтобы остановить.");
 
-            MainAsync(args).GetAwaiter().GetResult();
             Console.ReadLine();
         }
 
-        static async Task MainAsync(string[] args)
-        {
-            PaymentApiService paymentApiService = new PaymentApiService();
-            string orderId = "c5b3fd07-c66b-4f11-9999-1cc5d319f9e3"; 
-            String response = await paymentApiService.GetOrderDataAsync(orderId); 
-            Console.WriteLine(response);
-        }
 
         /// <summary>
         /// Основной метод отлова и обработки сообщений
