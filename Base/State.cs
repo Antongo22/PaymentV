@@ -64,7 +64,7 @@ namespace PaymentV
                     {
                         ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
                         {
-                            new KeyboardButton[] { "Получить ссылку", "Новая ссылка" },
+                            new KeyboardButton[] { "Получить ссылку", "Новая ссылка", "Просмотр команды" },
                         })
                         {
                             ResizeKeyboard = true
@@ -150,6 +150,17 @@ namespace PaymentV
                         await client.SendTextMessageAsync(message.Chat.Id, "У вас нет доступа к этой команде");
                     }
 
+                    break;
+                case "просмотр команды":
+                case "/showteam":
+                    if (message.Chat.Id == DataBase.ouwnerId)
+                    {
+                        await Owner.HandleShowTeam(client, message);
+                    }
+                    else
+                    {
+                        await client.SendTextMessageAsync(message.Chat.Id, "У вас нет доступа к этой команде");
+                    }
                     break;
                 case "/help":
                     await client.SendTextMessageAsync(message.Chat.Id, "Вам никто не поможет!)");

@@ -51,7 +51,7 @@ namespace PaymentV.Base
 
             if (!DataBase.IsNewKey(Owner.GetKey(), chatid))
             {
-                await client.SendTextMessageAsync(chatid, "Вы уже авторизировались, почле чего вам закрыли доступ!\n" +
+                await client.SendTextMessageAsync(chatid, "Вы уже авторизировались, после чего вам закрыли доступ!\n" +
                     "Если хотите снова получить доступ, попросить обновить ссылку или выдать вам доступ заново");
                 return;
             }
@@ -59,7 +59,9 @@ namespace PaymentV.Base
             await client.SendTextMessageAsync(callbackQuery.Message.Chat.Id, $"Запрос на добавление отправлен!");
             Data.userStates[chatid].botState = State.BotState.SendVerifiedRequest;
 
+
             await SendRequest(client, chatid, username);
+
         }
 
 
@@ -71,9 +73,9 @@ namespace PaymentV.Base
             InlineKeyboardMarkup inlineKeyboard = new(new[]
                    {
                         InlineKeyboardButton.WithCallbackData(
-                            text: "Принять", callbackData: $"requesttoowner:{chatid}:{mes.MessageId + 1}:confirm"),
+                            text: "Принять", callbackData: $"requesttoowner:{chatid}:{mes.MessageId + 1}:confirm:{username}"),
                          InlineKeyboardButton.WithCallbackData(
-                            text: "Отклонить", callbackData: $"requesttoowner:{chatid}:{mes.MessageId + 1}:notconfirm"),
+                            text: "Отклонить", callbackData: $"requesttoowner:{chatid}:{mes.MessageId + 1}:notconfirm:confirm:{username}"),
                     });
 
             await client.SendTextMessageAsync(DataBase.ouwnerId, $"Подтвердите запрос от @{username}", replyMarkup: inlineKeyboard);
@@ -86,6 +88,7 @@ namespace PaymentV.Base
             long chatid = long.Parse(callbackQuery.Data.Split(':')[1]);
             int messageId = int.Parse(callbackQuery.Data.Split(':')[2]);
             string status = callbackQuery.Data.Split(':')[3];
+            string username = callbackQuery.Data.Split(':')[4];
 
 
             try
@@ -101,23 +104,18 @@ namespace PaymentV.Base
             switch (status)
             {
                 case "confirm":
-                    DataBase.UpdateUserDataInXml(chatid, true);
+                    DataBase.UpdateUserDataInXml(chatid, true, username);
                     await client.SendTextMessageAsync(DataBase.ouwnerId, $"Запрос на добавление подтверждён!");
                     await client.SendTextMessageAsync(chatid, $"Вы верефецированны!!");
                     DataBase.SetVerKey(Owner.GetKey(), chatid);
                     break;
                 case "notconfirm":
-                    DataBase.UpdateUserDataInXml(chatid, false);
+                    DataBase.UpdateUserDataInXml(chatid, false, username);
                     await client.SendTextMessageAsync(callbackQuery.Message.Chat.Id, $"Запрос на добавление отклонён!");
                     await client.SendTextMessageAsync(chatid, $"Вам отказано в доступе!!");
                     DataBase.SetVerKey(Owner.GetKey(), chatid);
                     break;
             }
-
-            
-
         }
-
-
     }
 }

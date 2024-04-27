@@ -77,7 +77,7 @@ namespace PaymentV
 
                         await client.SendTextMessageAsync(message.Chat.Id, "Привет! Добро пожаловать в PaymentV! " +
                                                                             "Вы добавлены в команду кассиров!");
-                        DataBase.UpdateUserDataInXml(message.Chat.Id, true);
+                        DataBase.UpdateUserDataInXml(message.Chat.Id, true, message.Chat.Username);
 
                         await client.SendTextMessageAsync(DataBase.ouwnerId, $"@{message.Chat.Username} вступил в команду по ссылке");
                     }
@@ -132,6 +132,19 @@ namespace PaymentV
             {
                 await Verification.HandleGetRequest(client, callbackQuery);
             }
+            else if (callbackQuery.Data.StartsWith("recoveruser"))
+            {
+                await Owner.HandleRecover(client, callbackQuery);
+            }
+            else if (callbackQuery.Data.StartsWith("deleteuser"))
+            {
+                await Owner.HandleDelete(client, callbackQuery);
+            }
+            else if (callbackQuery.Data.StartsWith("confdelete"))
+            {
+                await Owner.HandleConfDelete(client, callbackQuery);
+            }
+
         }
 
         /// <summary>

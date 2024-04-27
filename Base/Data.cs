@@ -23,8 +23,5 @@ namespace PaymentV.Base
 
         // Хранение состояния для каждого пользователя
         public static Dictionary<long, User> userStates = new Dictionary<long, User>();
-
-
-
     }
 }

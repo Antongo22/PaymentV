@@ -63,7 +63,7 @@ namespace PaymentV
         }
 
 
-        public static void UpdateUserDataInXml(long chatid, bool isverified)
+        public static void UpdateUserDataInXml(long chatid, bool isverified, string username)
         {
             XmlDocument xmlDoc = LoadOrCreateXmlDocument();
 
@@ -87,6 +87,16 @@ namespace PaymentV
 
             isVerifiedNode.InnerText = isverified.ToString();
 
+
+            XmlNode usernameNode = userNode.SelectSingleNode("username");
+            if (usernameNode == null)
+            {
+                usernameNode = xmlDoc.CreateElement("username");
+                userNode.AppendChild(usernameNode);
+            }
+
+            usernameNode.InnerText = username.ToString();
+
             xmlDoc.Save(xmlfile);
 
 
@@ -100,6 +110,7 @@ namespace PaymentV
             }
 
             Data.userStates[chatid].isVerified = isverified;
+
         }
 
         public static void SetVerKey(string key, long chatid)
@@ -146,12 +157,12 @@ namespace PaymentV
 
             XmlNode lastVerKeyNode = userNode.SelectSingleNode("lastVerKey");
 
-            if (lastVerKeyNode == null)
+            if(key == null)
             {
-                lastVerKeyNode = xmlDoc.CreateElement("lastVerKey");
-                lastVerKeyNode.InnerText = key;
-                userNode.AppendChild(lastVerKeyNode);
-                xmlDoc.Save(xmlfile);
+                return true;
+            }
+            else if (lastVerKeyNode == null)
+            {
                 return true;
             }
             else
@@ -163,11 +174,39 @@ namespace PaymentV
                 }
                 else
                 {
-                    lastVerKeyNode.InnerText = key;
-                    xmlDoc.Save(xmlfile);
                     return true;
                 }
             }
+        }
+
+        public static (List<DataUser>, List<DataUser>) GetAllUsers()
+        {
+            List<DataUser> verifiedUsers = new List<DataUser>();
+            List<DataUser> unverifiedUsers = new List<DataUser>();
+
+            XmlDocument xmlDoc = LoadOrCreateXmlDocument();
+            XmlNodeList userNodes = xmlDoc.SelectNodes("/Users/User");
+
+            foreach (XmlNode userNode in userNodes)
+            {
+                string chatId = userNode.Attributes["chatid"].Value;
+                string name = userNode.SelectSingleNode("username").InnerText;
+                bool isVerified = false;
+                bool.TryParse(userNode.SelectSingleNode("isverified").InnerText, out isVerified);
+
+                DataUser user = new DataUser(chatId, name, isVerified);
+
+                if (isVerified)
+                {
+                    verifiedUsers.Add(user);
+                }
+                else
+                {
+                    unverifiedUsers.Add(user);
+                }
+            }
+
+            return (verifiedUsers, unverifiedUsers);
         }
 
     }
