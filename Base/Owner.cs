@@ -44,6 +44,8 @@ namespace PaymentV.Base
 
         public static string GetKey()
         {
+            if(!File.Exists(keyfile)) return null;
+
             return System.IO.File.ReadAllText(keyfile);
         }
     }

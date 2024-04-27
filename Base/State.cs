@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace PaymentV
 {
@@ -56,14 +57,35 @@ namespace PaymentV
         {
 
 
-            switch (message.Text)
+            switch (message.Text.ToLower())
             {
                 case "/start":
                     if(message.Chat.Id == DataBase.ouwnerId)
                     {
-                        await client.SendTextMessageAsync(message.Chat.Id, "Добро пожаловать в PaymentV! Сейчас мы вышлем вам письмо для приглашения сотрудников");
+                        ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
+                        {
+                            new KeyboardButton[] { "Получить ссылку", "Новая ссылка" },
+                        })
+                        {
+                            ResizeKeyboard = true
+                        };
 
-                        string link = Owner.GenerateLink();
+                        await client.SendTextMessageAsync(message.Chat.Id, "Добро пожаловать в PaymentV! " +
+                            "Сейчас мы вышлем вам письмо для приглашения сотрудников", replyMarkup: replyKeyboardMarkup);
+
+                        string link = Owner.GetKey();
+
+                        if (String.IsNullOrEmpty(link))
+                        {
+                            link = Owner.GenerateLink();
+                        }
+                        else
+                        {
+                            link = "https://t.me/NI_PaymentV_Bot?start=key-" + link;
+                        }
+
+                        Console.WriteLine(link);
+                       
                         string messageText = $"Вас приглашают в PaymentV!";
 
                         string[] words = messageText.Split(' ');
@@ -79,6 +101,7 @@ namespace PaymentV
                     }
                     break;
                 case "/newlink":
+                case "новая ссылка":
                     if (message.Chat.Id == DataBase.ouwnerId)
                     {
                         await client.SendTextMessageAsync(message.Chat.Id, "Сейчас мы вышлем вам письмо для приглашения сотрудников с новой ссылкой");
@@ -96,6 +119,37 @@ namespace PaymentV
                     {
                         await client.SendTextMessageAsync(message.Chat.Id, "У вас нет доступа к этой команде");
                     }
+                    break;
+                case "получить ссылку":
+                case "/getlink":
+                    if (message.Chat.Id == DataBase.ouwnerId)
+                    {
+                        await client.SendTextMessageAsync(message.Chat.Id, "Сейчас мы вышлем вам письмо для приглашения сотрудников");
+
+                        string link = Owner.GetKey();
+
+                        if (String.IsNullOrEmpty(link))
+                        {
+                            link = Owner.GenerateLink();
+                        }
+                        else
+                        {
+                            link = "https://t.me/NI_PaymentV_Bot?start=key-" + link;
+                        }
+
+                        string messageText = $"Вас приглашают в PaymentV!";
+
+                        string[] words = messageText.Split(' ');
+                        words[words.Length - 1] = $"<a href='{link}'>{words[words.Length - 1]}</a>";
+                        string hyperlinkedMessage = string.Join(" ", words);
+
+                        await client.SendTextMessageAsync(message.Chat.Id, hyperlinkedMessage, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html);
+                    }
+                    else
+                    {
+                        await client.SendTextMessageAsync(message.Chat.Id, "У вас нет доступа к этой команде");
+                    }
+
                     break;
                 case "/help":
                     await client.SendTextMessageAsync(message.Chat.Id, "Вам никто не поможет!)");

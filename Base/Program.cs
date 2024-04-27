@@ -88,6 +88,11 @@ namespace PaymentV
                     }
                     return;                
                 }
+                else if (message.Text.StartsWith("/start") && message.Text.Contains("key") && message.Chat.Id == DataBase.ouwnerId)
+                {
+                    await client.SendTextMessageAsync(DataBase.ouwnerId, $"Вы и так владелец, зачем вам вступать по ссылке кассира?)");
+                    return;
+                }
 
                 switch (State.GetBotState(message.Chat.Id))
                 {
