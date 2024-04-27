@@ -124,6 +124,11 @@ namespace PaymentV
             }
             else if (callbackQuery != null)
             {
+                if (!DataBase.IsVerified(callbackQuery.Message.Chat.Id))
+                {
+                    await client.SendTextMessageAsync(callbackQuery.Message.Chat.Id, $"У вас нет доступа к этому боту!");
+                    return;
+                }
                 await HandleCallbackQuery(client, callbackQuery);
             }
         }

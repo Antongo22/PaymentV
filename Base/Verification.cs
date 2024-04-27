@@ -106,13 +106,13 @@ namespace PaymentV.Base
                 case "confirm":
                     DataBase.UpdateUserDataInXml(chatid, true, username);
                     await client.SendTextMessageAsync(DataBase.ouwnerId, $"Запрос на добавление подтверждён!");
-                    await client.SendTextMessageAsync(chatid, $"Вы верефецированны!!");
+                    await client.SendTextMessageAsync(chatid, $"Вы верефецированны!");
                     DataBase.SetVerKey(Owner.GetKey(), chatid);
                     break;
                 case "notconfirm":
                     DataBase.UpdateUserDataInXml(chatid, false, username);
                     await client.SendTextMessageAsync(callbackQuery.Message.Chat.Id, $"Запрос на добавление отклонён!");
-                    await client.SendTextMessageAsync(chatid, $"Вам отказано в доступе!!");
+                    await client.SendTextMessageAsync(chatid, $"Вам отказано в доступе!");
                     DataBase.SetVerKey(Owner.GetKey(), chatid);
                     break;
             }
