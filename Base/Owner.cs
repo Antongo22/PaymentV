@@ -39,5 +39,12 @@ namespace PaymentV.Base
             }
             return stringBuilder.ToString();
         }
+
+
+
+        public static string GetKey()
+        {
+            return System.IO.File.ReadAllText(keyfile);
+        }
     }
 }

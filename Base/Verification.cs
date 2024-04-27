@@ -14,6 +14,13 @@ namespace PaymentV.Base
     {
         async public static Task HandleUnVerified(ITelegramBotClient client, Message message)
         {
+            if (!DataBase.IsNewKey(Owner.GetKey(), message.Chat.Id))
+            {
+                await client.SendTextMessageAsync(message.Chat.Id, "Вы уже авторизировались, почле чего вам закрыли доступ!\n" +
+                    "Если хотите снова получить доступ, попросить обновить ссылку или выдать вам доступ заново");
+                return;
+            }
+
             InlineKeyboardMarkup inlineKeyboard = new(new[]
                     {
                         InlineKeyboardButton.WithCallbackData(
@@ -39,6 +46,13 @@ namespace PaymentV.Base
             }
             catch (Exception ex)
             {
+                return;
+            }
+
+            if (!DataBase.IsNewKey(Owner.GetKey(), chatid))
+            {
+                await client.SendTextMessageAsync(chatid, "Вы уже авторизировались, почле чего вам закрыли доступ!\n" +
+                    "Если хотите снова получить доступ, попросить обновить ссылку или выдать вам доступ заново");
                 return;
             }
 
@@ -83,17 +97,20 @@ namespace PaymentV.Base
                 return;
             }
 
+
             switch (status)
             {
                 case "confirm":
                     DataBase.UpdateUserDataInXml(chatid, true);
                     await client.SendTextMessageAsync(DataBase.ouwnerId, $"Запрос на добавление подтверждён!");
                     await client.SendTextMessageAsync(chatid, $"Вы верефецированны!!");
+                    DataBase.SetVerKey(Owner.GetKey(), chatid);
                     break;
                 case "notconfirm":
                     DataBase.UpdateUserDataInXml(chatid, false);
                     await client.SendTextMessageAsync(callbackQuery.Message.Chat.Id, $"Запрос на добавление отклонён!");
                     await client.SendTextMessageAsync(chatid, $"Вам отказано в доступе!!");
+                    DataBase.SetVerKey(Owner.GetKey(), chatid);
                     break;
             }
 

@@ -56,7 +56,7 @@ namespace PaymentV
         {
 
 
-            switch (message.Text.Split(' ')[0])
+            switch (message.Text)
             {
                 case "/start":
                     if(message.Chat.Id == DataBase.ouwnerId)

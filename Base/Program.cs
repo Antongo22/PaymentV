@@ -63,10 +63,18 @@ namespace PaymentV
                     }
                 }
 
-                if (message.Text.StartsWith("/start") && message.Text.Contains("key") && message.Chat.Id != DataBase.ouwnerId)
+                if (message.Text.StartsWith("/start") && message.Text.Contains("key") && message.Chat.Id != DataBase.ouwnerId && !DataBase.IsVerified(message.Chat.Id))
                 {                    
                     if (Owner.IsValidKey(message.Text))
                     {
+                        string key = message.Text.Split('-')[1];
+                        if (!DataBase.IsNewKey(key, message.Chat.Id))
+                        {
+                            await client.SendTextMessageAsync(message.Chat.Id, "Вы уже авторизировались по этой ссылке и вам закрыли доступ!\n" +
+                                "Если хотите снова получить доступ, попросить обновить ссылку или выдать вам доступ заново");
+                            return;
+                        }
+
                         await client.SendTextMessageAsync(message.Chat.Id, "Привет! Добро пожаловать в PaymentV! " +
                                                                             "Вы добавлены в команду кассиров!");
                         DataBase.UpdateUserDataInXml(message.Chat.Id, true);

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Xml;
+using Telegram.Bot.Types;
 
 namespace PaymentV
 {
@@ -17,7 +18,7 @@ namespace PaymentV
         private static XmlDocument LoadOrCreateXmlDocument()
         {
             XmlDocument xmlDoc = new XmlDocument();
-            if (File.Exists(xmlfile))
+            if (System.IO.File.Exists(xmlfile))
             {
                 xmlDoc.Load(xmlfile);
             }
@@ -99,6 +100,74 @@ namespace PaymentV
             }
 
             Data.userStates[chatid].isVerified = isverified;
+        }
+
+        public static void SetVerKey(string key, long chatid)
+        {
+            XmlDocument xmlDoc = LoadOrCreateXmlDocument();
+
+            XmlNode userNode = xmlDoc.SelectSingleNode($"/Users/User[@chatid='{chatid}']");
+
+            if (userNode == null)
+            {
+                userNode = xmlDoc.CreateElement("User");
+                XmlAttribute chatidAttribute = xmlDoc.CreateAttribute("chatid");
+                chatidAttribute.Value = chatid.ToString();
+                userNode.Attributes.Append(chatidAttribute);
+                xmlDoc.SelectSingleNode("/Users").AppendChild(userNode);
+            }
+
+            XmlNode lastVerKeyNode = userNode.SelectSingleNode("lastVerKey");
+            if (lastVerKeyNode == null)
+            {
+                lastVerKeyNode = xmlDoc.CreateElement("lastVerKey");
+                userNode.AppendChild(lastVerKeyNode);
+            }
+
+            lastVerKeyNode.InnerText = key;
+            xmlDoc.Save(xmlfile);
+        }
+
+
+        public static bool IsNewKey(string key, long chatid)
+        {
+            XmlDocument xmlDoc = LoadOrCreateXmlDocument();
+
+            XmlNode userNode = xmlDoc.SelectSingleNode($"/Users/User[@chatid='{chatid}']");
+
+            if (userNode == null)
+            {
+                userNode = xmlDoc.CreateElement("User");
+                XmlAttribute chatidAttribute = xmlDoc.CreateAttribute("chatid");
+                chatidAttribute.Value = chatid.ToString();
+                userNode.Attributes.Append(chatidAttribute);
+                xmlDoc.SelectSingleNode("/Users").AppendChild(userNode);
+            }
+
+            XmlNode lastVerKeyNode = userNode.SelectSingleNode("lastVerKey");
+
+            if (lastVerKeyNode == null)
+            {
+                lastVerKeyNode = xmlDoc.CreateElement("lastVerKey");
+                lastVerKeyNode.InnerText = key;
+                userNode.AppendChild(lastVerKeyNode);
+                xmlDoc.Save(xmlfile);
+                return true;
+            }
+            else
+            {
+                string existingKey = lastVerKeyNode.InnerText;
+                if (existingKey == key)
+                {
+                    return false;
+                }
+                else
+                {
+                    lastVerKeyNode.InnerText = key;
+                    xmlDoc.Save(xmlfile);
+                    return true;
+                }
+            }
         }
 
     }
