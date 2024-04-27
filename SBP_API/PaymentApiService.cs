@@ -16,11 +16,8 @@ namespace PaymentV.SBP_API
         private PaymentApiService()
         {
             _httpClient = new HttpClient();
-            // Загрузка переменных окружения из файла .env
             DotNetEnv.Env.Load();
-            // Получение значения переменной окружения SECRET_KEY
             string secretKey = Environment.GetEnvironmentVariable("SECRET_KEY");
-            // Добавляем заголовок Authorization с помощью Bearer токена
             _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {secretKey}");
         }
 
@@ -40,53 +37,39 @@ namespace PaymentV.SBP_API
         {
             try
             {
-                // Формируем URL для запроса, подставляя значение orderId
                 string apiUrl = $"https://pay-test.raif.ru/api/payment/v1/orders/{orderId}";
 
 
-                // Выполняем GET запрос и получаем ответ
                 HttpResponseMessage response = await _httpClient.GetAsync(apiUrl);
 
-                // Проверяем успешность запроса
                 response.EnsureSuccessStatusCode();
 
-                // Читаем ответ в виде строки
                 string responseBody = await response.Content.ReadAsStringAsync();
 
-                // Преобразуем JSON-строку в объект JObject
                 JObject jsonResponse = JObject.Parse(responseBody);
 
-                // Получаем значение поля status.value
                 string orderQR = jsonResponse?["qr"]?["id"]?.ToString();
 
                 apiUrl = $"https://pay-test.raif.ru/api/sbp/v2/qrs/{orderQR}";
 
-                // Выполняем GET запрос и получаем ответ
                 response = await _httpClient.GetAsync(apiUrl);
 
-                // Проверяем успешность запроса
                 response.EnsureSuccessStatusCode();
 
-                // Читаем ответ в виде строки
                 responseBody = await response.Content.ReadAsStringAsync();
 
-                // Преобразуем JSON-строку в объект JObject
                 jsonResponse = JObject.Parse(responseBody);
 
-                // Получаем значение поля status.value
                 string orderStatus = jsonResponse["qrStatus"].ToString();
 
-                // Возвращаем полученные данные
                 return orderStatus;
             }
             catch (HttpRequestException ex)
             {
-                // Обрабатываем ошибки HTTP запроса
                 return null;
             }
             catch (Exception ex)
             {
-                // Обрабатываем другие исключения
                 return null;
             }
         }
