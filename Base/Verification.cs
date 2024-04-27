@@ -52,7 +52,7 @@ namespace PaymentV.Base
         static async Task SendRequest(ITelegramBotClient client, long chatid, string username)
         {
 
-            var mes = await client.SendTextMessageAsync(DataBase.ouwnerId, $"Новый запрос на верефикацию от {username}");
+            var mes = await client.SendTextMessageAsync(DataBase.ouwnerId, $"Новый запрос на верефикацию от @{username}");
 
             InlineKeyboardMarkup inlineKeyboard = new(new[]
                    {
@@ -77,7 +77,6 @@ namespace PaymentV.Base
             try
             {
                 await client.DeleteMessageAsync(DataBase.ouwnerId, messageId);
-                await client.DeleteMessageAsync(DataBase.ouwnerId, messageId - 1);
             }
             catch (Exception ex)
             {
@@ -87,12 +86,12 @@ namespace PaymentV.Base
             switch (status)
             {
                 case "confirm":
-                    DataBase.SetVerification(chatid);
+                    DataBase.UpdateUserDataInXml(chatid, true);
                     await client.SendTextMessageAsync(DataBase.ouwnerId, $"Запрос на добавление подтверждён!");
                     await client.SendTextMessageAsync(chatid, $"Вы верефецированны!!");
                     break;
                 case "notconfirm":
-                    DataBase.SetNotVerification(chatid);
+                    DataBase.UpdateUserDataInXml(chatid, false);
                     await client.SendTextMessageAsync(callbackQuery.Message.Chat.Id, $"Запрос на добавление отклонён!");
                     await client.SendTextMessageAsync(chatid, $"Вам отказано в доступе!!");
                     break;

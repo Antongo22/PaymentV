@@ -16,7 +16,8 @@ namespace PaymentV
     internal class Program
     {
         static void Main(string[] args)
-        {
+        {        
+
             DotNetEnv.Env.Load();
             var BotToken = DotNetEnv.Env.GetString("BOT_TOKEN"); ;
             var client = new TelegramBotClient(BotToken); // создание бота с нашим токеном
