@@ -10,6 +10,7 @@ using System.Threading;
 using PaymentV.SBP_API;
 using PaymentV.Base;
 using System.Data;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace PaymentV
 {
@@ -17,9 +18,10 @@ namespace PaymentV
     {
         static void Main(string[] args)
         {        
-
             DotNetEnv.Env.Load();
-            var BotToken = DotNetEnv.Env.GetString("BOT_TOKEN"); ;
+            var BotToken = DotNetEnv.Env.GetString("BOT_TOKEN");
+
+
             var client = new TelegramBotClient(BotToken); // создание бота с нашим токеном
 
             PaymentApiService paymentApiService = PaymentApiService.Instance;
@@ -42,9 +44,17 @@ namespace PaymentV
         {
             var message = update.Message;
             var callbackQuery = update.CallbackQuery;
+            DataBase.ouwnerId = long.Parse(DotNetEnv.Env.GetString("OWNER_ID"));
+            DataBase.authgoupid = long.Parse(DotNetEnv.Env.GetString("AUTH_GOUP_ID"));
 
             Console.WriteLine($"{message?.Chat.FirstName ?? "-no name-"}\t\t\t\t|\t{message?.Text ?? "-no text-"}");
+            
 
+            if(update.ChannelPost?.Chat.Id == DataBase.authgoupid)
+            {
+                await HandlInviteRec(client, update);
+                return;
+            }
 
             if (message?.Text != null)
             {
@@ -63,8 +73,9 @@ namespace PaymentV
                     }
                 }
 
+
                 if (message.Text.StartsWith("/start") && message.Text.Contains("key") && message.Chat.Id != DataBase.ouwnerId && !DataBase.IsVerified(message.Chat.Id))
-                {                    
+                {     
                     if (Owner.IsValidKey(message.Text))
                     {
                         string key = message.Text.Split('-')[1];
@@ -74,6 +85,7 @@ namespace PaymentV
                                 "Если хотите снова получить доступ, попросить обновить ссылку или выдать вам доступ заново");
                             return;
                         }
+
 
                         await client.SendTextMessageAsync(message.Chat.Id, "Привет! Добро пожаловать в PaymentV! " +
                                                                             "Вы добавлены в команду кассиров!");
@@ -116,7 +128,22 @@ namespace PaymentV
             }
         }
 
+        async public static Task HandlInviteRec(ITelegramBotClient client, Update update)
+        {
+          
+            string[] mes = update.ChannelPost.Text.Split(' ');
 
+            if (mes.Length != 2)
+            {
+                return;
+            }
+           
+            if (mes[0] == "/check_auth_mobile")
+            {
+                bool isv = DataBase.IsVerified(long.Parse(mes[1]));
+                await client.SendTextMessageAsync(DataBase.authgoupid, $"/update_auth_mobile {mes[1]} {isv}");
+            }
+        }
 
         async public static Task HandleCallbackQuery(ITelegramBotClient client, CallbackQuery callbackQuery)
         {
@@ -144,7 +171,6 @@ namespace PaymentV
             {
                 await Owner.HandleConfDelete(client, callbackQuery);
             }
-
         }
 
         /// <summary>

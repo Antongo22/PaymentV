@@ -12,7 +12,10 @@ namespace PaymentV
 {
     public static class DataBase
     {
-        public static readonly long ouwnerId = 860491148;
+        public static long ouwnerId;
+        public static long authgoupid;
+
+
         static string xmlfile = "usersdata.xml";
 
         private static XmlDocument LoadOrCreateXmlDocument()
@@ -42,7 +45,7 @@ namespace PaymentV
         }
 
 
-        public static bool IsUserVerified(long chatid)
+        static bool IsUserVerified(long chatid)
         {
             XmlDocument xmlDoc = LoadOrCreateXmlDocument();
 

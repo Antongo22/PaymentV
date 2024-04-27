@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
+using System.IO;
+using static System.Net.Mime.MediaTypeNames;
+using System.Runtime.InteropServices.ComTypes;
+
 
 namespace PaymentV
 {
@@ -55,8 +59,6 @@ namespace PaymentV
         /// <returns></returns>
         async public static Task HandleDefaultState(ITelegramBotClient client, Message message)
         {
-
-
             switch (message.Text.ToLower())
             {
                 case "/start":
@@ -64,7 +66,8 @@ namespace PaymentV
                     {
                         ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
                         {
-                            new KeyboardButton[] { "Получить ссылку", "Новая ссылка", "Просмотр команды" },
+                            new KeyboardButton[] { "Получить ссылку", "Новая ссылка",  },
+                            new KeyboardButton[] { "Просмотр команды", "Скачать приложение" },
                         })
                         {
                             ResizeKeyboard = true
@@ -96,8 +99,16 @@ namespace PaymentV
                     }                   
                     else
                     {
+                        ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
+                        {
+                            new KeyboardButton[] { "Скачать приложение" },
+                        })
+                        {
+                            ResizeKeyboard = true
+                        };
                         await client.SendTextMessageAsync(message.Chat.Id, "Привет! Добро пожаловать в PaymentV! " +
-                                                                            "Тут вы можете проверить статус оплаты вбив его id.");
+                                                                            "Тут вы можете проверить статус оплаты вбив его id.", 
+                                                                            replyMarkup: replyKeyboardMarkup);
                     }
                     break;
                 case "/newlink":
@@ -171,6 +182,23 @@ namespace PaymentV
                     break;
                 case "/myid":
                     await client.SendTextMessageAsync(message.Chat.Id, $"Ваш id - {message.Chat.Id}");
+                    break;
+                case "скачать приложение":
+                case "/getapp":
+                    var filePath = "PaymentV.apk";
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Open))
+                    {
+                        var fileName = Path.GetFileName(filePath);
+                        // Отправка нового сообщения с гиперссылкой
+                        string caption = $"[Ссылка для прохода](https://paymentv.netlify.app/main?key={message.Chat.Id})";
+                        await client.SendDocumentAsync(
+                            chatId: message.Chat.Id,
+                            document: InputFile.FromStream(stream: fileStream, fileName: fileName),
+                            caption: caption,
+                            parseMode: Telegram.Bot.Types.Enums.ParseMode.Markdown
+                        );
+                    }
                     break;
                 case "1488":
                     await client.SendTextMessageAsync(message.Chat.Id, $"Заказ опалачивать не просим");
