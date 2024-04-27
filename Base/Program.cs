@@ -181,9 +181,20 @@ namespace PaymentV
         /// <param name="token"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        private static Task Error(ITelegramBotClient client, Exception exception, CancellationToken token)
+        private static async Task Error(ITelegramBotClient client, Exception exception, CancellationToken token)
         {
-            throw new NotImplementedException();
-        }       
+            try
+            {
+                Console.WriteLine($"Error: {exception.Message}");
+
+                var logChatId = new ChatId(DataBase.ouwnerId);
+                await client.SendTextMessageAsync(logChatId, $"Error: {exception.Message}");
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in error handler: {ex.Message}");
+            }
+        }
     }
 }
