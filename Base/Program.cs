@@ -124,7 +124,8 @@ namespace PaymentV
             }
             else if (callbackQuery != null)
             {
-                if (!DataBase.IsVerified(callbackQuery.Message.Chat.Id))
+                if (callbackQuery.Data.StartsWith("request:")) { }
+                else if (!DataBase.IsVerified(callbackQuery.Message.Chat.Id))
                 {
                     await client.SendTextMessageAsync(callbackQuery.Message.Chat.Id, $"У вас нет доступа к этому боту!");
                     return;
@@ -164,15 +165,15 @@ namespace PaymentV
             {
                 await Verification.HandleGetRequest(client, callbackQuery);
             }
-            else if (callbackQuery.Data.StartsWith("recoveruser"))
+            else if (callbackQuery.Data.StartsWith("recoveruser:"))
             {
                 await Owner.HandleRecover(client, callbackQuery);
             }
-            else if (callbackQuery.Data.StartsWith("deleteuser"))
+            else if (callbackQuery.Data.StartsWith("deleteuser:"))
             {
                 await Owner.HandleDelete(client, callbackQuery);
             }
-            else if (callbackQuery.Data.StartsWith("confdelete"))
+            else if (callbackQuery.Data.StartsWith("confdelete:"))
             {
                 await Owner.HandleConfDelete(client, callbackQuery);
             }
