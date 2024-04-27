@@ -73,6 +73,9 @@ namespace PaymentV
                     case State.BotState.SendVerifiedRequest:
                         await client.SendTextMessageAsync(message.Chat.Id, $"Ожидание решения заказчика!");
                         break;
+                    case State.BotState.VerifiedFailed:
+                        await client.SendTextMessageAsync(message.Chat.Id, $"У вас нет доступа к этому боту!");
+                        break;
                 }
             }
             else if (callbackQuery != null)
@@ -91,7 +94,11 @@ namespace PaymentV
             }
             else if (callbackQuery.Data.StartsWith("request:"))
             {
-                await Verification.HandleUpdateOrder(client, callbackQuery);
+                await Verification.HandleSendRequest(client, callbackQuery);
+            }
+            else if (callbackQuery.Data.StartsWith("requesttoowner:"))
+            {
+                await Verification.HandleGetRequest(client, callbackQuery);
             }
         }
 

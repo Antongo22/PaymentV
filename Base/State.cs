@@ -18,6 +18,7 @@ namespace PaymentV
             OrderNotPaid, // статус того, то заказ не оплачен
             UnVerified, // состояние, когда невкрефицирован
             SendVerifiedRequest, // состояние отправки запроса на добавление в команду
+            VerifiedFailed, // состояние, когда отклонили верефикацию
         }
 
         /// <summary>
