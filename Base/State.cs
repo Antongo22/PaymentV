@@ -19,6 +19,8 @@ namespace PaymentV
             UnVerified, // состояние, когда невкрефицирован
             SendVerifiedRequest, // состояние отправки запроса на добавление в команду
             VerifiedFailed, // состояние, когда отклонили верефикацию
+
+            StartOwner, 
         }
 
         /// <summary>
@@ -52,11 +54,48 @@ namespace PaymentV
         /// <returns></returns>
         async public static Task HandleDefaultState(ITelegramBotClient client, Message message)
         {
-            switch (message.Text)
+
+
+            switch (message.Text.Split(' ')[0])
             {
                 case "/start":
-                    await client.SendTextMessageAsync(message.Chat.Id, "Привет! Добро пожаловать в PaymentV! " +
-                        "Тут вы можете проверить статус оплаты.");
+                    if(message.Chat.Id == DataBase.ouwnerId)
+                    {
+                        await client.SendTextMessageAsync(message.Chat.Id, "Добро пожаловать в PaymentV! Сейчас мы вышлем вам письмо для приглашения сотрудников");
+
+                        string link = Owner.GenerateLink();
+                        string messageText = $"Вас приглашают в PaymentV!";
+
+                        string[] words = messageText.Split(' ');
+                        words[words.Length - 1] = $"<a href='{link}'>{words[words.Length - 1]}</a>";
+                        string hyperlinkedMessage = string.Join(" ", words);
+
+                        await client.SendTextMessageAsync(message.Chat.Id, hyperlinkedMessage, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html);
+                    }                   
+                    else
+                    {
+                        await client.SendTextMessageAsync(message.Chat.Id, "Привет! Добро пожаловать в PaymentV! " +
+                                                                            "Тут вы можете проверить статус оплаты вбив его id.");
+                    }
+                    break;
+                case "/newlink":
+                    if (message.Chat.Id == DataBase.ouwnerId)
+                    {
+                        await client.SendTextMessageAsync(message.Chat.Id, "Сейчас мы вышлем вам письмо для приглашения сотрудников с новой ссылкой");
+
+                        string link = Owner.GenerateLink();
+                        string messageText = $"Вас приглашают в PaymentV!";
+
+                        string[] words = messageText.Split(' ');
+                        words[words.Length - 1] = $"<a href='{link}'>{words[words.Length - 1]}</a>";
+                        string hyperlinkedMessage = string.Join(" ", words);
+
+                        await client.SendTextMessageAsync(message.Chat.Id, hyperlinkedMessage, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html);
+                    }
+                    else
+                    {
+                        await client.SendTextMessageAsync(message.Chat.Id, "У вас нет доступа к этой команде");
+                    }
                     break;
                 case "/help":
                     await client.SendTextMessageAsync(message.Chat.Id, "Вам никто не поможет!)");

@@ -63,6 +63,24 @@ namespace PaymentV
                     }
                 }
 
+                if (message.Text.StartsWith("/start") && message.Text.Contains("key") && message.Chat.Id != DataBase.ouwnerId)
+                {                    
+                    if (Owner.IsValidKey(message.Text))
+                    {
+                        await client.SendTextMessageAsync(message.Chat.Id, "Привет! Добро пожаловать в PaymentV! " +
+                                                                            "Вы добавлены в команду кассиров!");
+                        DataBase.UpdateUserDataInXml(message.Chat.Id, true);
+
+                        await client.SendTextMessageAsync(DataBase.ouwnerId, $"@{message.Chat.Username} вступил в команду по ссылке");
+                    }
+                    else
+                    {
+                        await client.SendTextMessageAsync(message.Chat.Id, "Привет! Добро пожаловать в PaymentV! " +
+                                                                            "Ваша ссылка не валидна! Сообщите об этом вашему администратору!");
+                    }
+                    return;                
+                }
+
                 switch (State.GetBotState(message.Chat.Id))
                 {
                     case State.BotState.Default:

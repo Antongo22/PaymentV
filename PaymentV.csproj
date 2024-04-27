@@ -221,6 +221,7 @@
   <ItemGroup>
     <Compile Include="Base\Data.cs" />
     <Compile Include="Base\GetOrder.cs" />
+    <Compile Include="Base\Owner.cs" />
     <Compile Include="Base\Program.cs" />
     <Compile Include="Base\Verification.cs" />
     <Compile Include="DataBase.cs" />
